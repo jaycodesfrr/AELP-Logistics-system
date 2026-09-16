@@ -144,15 +144,6 @@ Taro Tanaka            | Mechanic & Snowcat Driver    | pass104
 Sven Nygård            | Radio & Satellite Specialist | pass105
 
 
-5. LAUNCHING THE APPLICATION
---------------------------------------------------------------------------------
-To launch the complete Antarctica Expedition & Logistics Platform:
-
-1. Double-click `AELP-Station-App.bat` in the project root directory.
-   This starts the Java Spring Boot backend server on `http://localhost:3000` and automatically opens the Station Hub in your browser.
-
-2. To launch the mobile field client:
-   Double-click `Launch-Expo-Mobile.bat`.
 
 ================================================================================
                ANTARCTICA EXPEDITION & LOGISTICS PLATFORM (AELP)
