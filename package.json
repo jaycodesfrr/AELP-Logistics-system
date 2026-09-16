@@ -1,0 +1,36 @@
+{
+  "name": "antarctica-expedition-logistics-platform",
+  "version": "1.0.0",
+  "description": "Antarctica Expedition & Logistics Platform (AELP) - Desktop Application",
+  "main": "main-electron.js",
+  "scripts": {
+    "start": "node server.js",
+    "app": "electron .",
+    "app:dev": "electron .",
+    "app:dist": "electron-builder",
+    "launch-native": "node launch-desktop.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.aelp.stationhub",
+    "productName": "AELP Tactical Station Hub",
+    "win": {
+      "target": "portable"
+    },
+    "files": [
+      "main-electron.js",
+      "server.js",
+      "public/**/*",
+      "src/**/*",
+      "node_modules/**/*"
+    ]
+  }
+}

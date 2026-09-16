@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Antarctica Expedition & Logistics Platform (AELP) - Centralized offline-first logistics, cargo tracking, inventory, personnel movement, and emergency response system.">
+    <meta name="theme-color" content="#080d16">
+    <meta property="og:title" content="Antarctica Expedition & Logistics Platform">
+    <meta property="og:description" content="Offline-first Antarctic station management, expedition planning, and emergency response platform.">
+    <meta property="og:type" content="website">
+    
+    <title>AELP | Antarctica Expedition & Logistics Platform</title>
+    
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="css/tactical.css">
+</head>
+<body>
+
+    <!-- Station Header -->
+    <header class="top-bar">
+        <div class="brand">
+            <div class="brand-icon-svg" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="2" x2="12" y2="22"></line>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                    <line x1="19.07" y1="4.93" x2="4.93" y2="19.07"></line>
+                </svg>
+            </div>
+            <div>
+                <h1 class="brand-title">AELP TACTICAL STATION HUB</h1>
+                <p class="brand-sub">MCMURDO MAIN BASE &bull; OFFLINE-FIRST EMBEDDED SYSTEM</p>
+            </div>
+        </div>
+
+        <div class="station-status-bar">
+            <div class="status-indicator">
+                <span class="status-dot" id="satDot"></span>
+                <span id="satText">SATELLITE: OFFLINE</span>
+            </div>
+            <div class="status-indicator">
+                <span>QUEUE:</span>
+                <span id="pendingQueueBadge" style="color:var(--polar-blue-light); font-weight:bold;">0 DELTAS</span>
+            </div>
+            <div class="status-indicator" style="border-color:var(--polar-blue);">
+                <span style="color:var(--polar-blue-light);">ROLE: LOGISTICS COMMAND</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" aria-label="Main Navigation">
+        <button class="tab-btn active" data-tab="dashboard">DASHBOARD</button>
+        <button class="tab-btn" data-tab="expeditions">EXPEDITIONS & MAP</button>
+        <button class="tab-btn" data-tab="cargo">CARGO & QR TRACKING</button>
+        <button class="tab-btn" data-tab="inventory">INVENTORY LEDGER</button>
+        <button class="tab-btn" data-tab="personnel">PERSONNEL & FIELD</button>
+        <button class="tab-btn emergency-tab" data-tab="emergency">EMERGENCY RESPONSE</button>
+        <button class="tab-btn" data-tab="sync">SYNC & BACKUP</button>
+    </nav>
+
+    <main>
+        <!-- TAB 1: DASHBOARD -->
+        <section id="tab-dashboard" class="tab-content active" aria-labelledby="dash-heading">
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Active Field Personnel</span>
+                    <span class="stat-value" id="statPersonnel">3</span>
+                    <span class="stat-sub">In field excursions / traverse</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Active Expeditions</span>
+                    <span class="stat-value" id="statExpeditions">1</span>
+                    <span class="stat-sub">South Pole Resupply & Dry Valleys</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Low Stock Alerts</span>
+                    <span class="stat-value" id="statLowStock" style="color:var(--warning-amber);">2</span>
+                    <span class="stat-sub">Items at or below reorder threshold</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Open Incidents</span>
+                    <span class="stat-value" id="statIncidents" style="color:var(--alert-red);">1</span>
+                    <span class="stat-sub">Requires commander resolution</span>
+                </div>
+            </div>
+
+            <div class="panel-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title" id="dash-heading">Expedition Active Roster & Status</h2>
+                    </div>
+                    <table class="tactical-table">
+                        <thead>
+                            <tr>
+                                <th>Expedition</th>
+                                <th>Status</th>
+                                <th>Team Lead</th>
+                                <th>Calculated Fuel (L)</th>
+                                <th>Rations (kcal)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashExpeditionTable">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Polar Weather & Environment</h2>
+                    </div>
+                    <div style="font-family:var(--font-mono); font-size:0.88rem; line-height:1.8;">
+                        <p>Location: <b>McMurdo Sound (77.85° S, 166.66° E)</b></p>
+                        <p>Temperature: <b style="color:var(--polar-blue-light);">-32.4° C</b> (Wind Chill -48° C)</p>
+                        <p>Wind Speed: <b>38 knots (South-Southeast)</b></p>
+                        <p>Condition: <b>Blowing Snow / Whiteout Risk</b></p>
+                        <p>Satellite Uplink Window: <b>Next at 02:30 UTC (ANIK-F2)</b></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: EXPEDITIONS & MAP -->
+        <section id="tab-expeditions" class="tab-content">
+            <div class="panel-grid">
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Offline Antarctic Vector Map & Waypoint Viewer</h2>
+                        </div>
+                        <div class="map-container">
+                            <canvas id="antarcticMap" aria-label="Antarctic Vector Map"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Expedition Timeline Gantt View</h2>
+                        </div>
+                        <div id="ganttContainer" style="padding:10px; background:#070d16; border-radius:6px;">
+                            <!-- Gantt rendered here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Plan New Expedition</h2>
+                        </div>
+                        <form id="expeditionForm">
+                            <label for="expName" class="stat-label">Expedition Name</label>
+                            <input type="text" id="expName" class="input-field" placeholder="e.g. Queen Maud Science Traverse" required>
+
+                            <label for="expStart" class="stat-label">Start Date</label>
+                            <input type="date" id="expStart" class="input-field" required>
+
+                            <label for="expEnd" class="stat-label">End Date</label>
+                            <input type="date" id="expEnd" class="input-field" required>
+
+                            <label for="expRoute" class="stat-label">Route Select</label>
+                            <select id="expRoute" class="select-field">
+                                <option value="rt-01">South Pole Traverse Highway (1600 km)</option>
+                                <option value="rt-02">Dry Valleys Science Survey (185 km)</option>
+                            </select>
+
+                            <label for="expLead" class="stat-label">Team Lead</label>
+                            <select id="expLead" class="select-field">
+                                <option value="p-101">Capt. James Miller (Field Lead)</option>
+                                <option value="p-103">Markus Bauer (Senior Glaciologist)</option>
+                            </select>
+
+                            <label for="expTeamSize" class="stat-label">Team Size (Persons)</label>
+                            <input type="number" id="expTeamSize" class="input-field" value="4" min="1">
+
+                            <label for="expDays" class="stat-label">Duration (Days)</label>
+                            <input type="number" id="expDays" class="input-field" value="10" min="1">
+
+                            <label for="expObjectives" class="stat-label">Objectives</label>
+                            <textarea id="expObjectives" class="textarea-field" rows="2" placeholder="Primary field objectives..."></textarea>
+
+                            <button type="submit" class="btn btn-primary" style="width:100%;">Calculate & Create Expedition</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: CARGO & QR TRACKING -->
+        <section id="tab-cargo" class="tab-content">
+            <div class="panel-grid">
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Cargo Manifest & Checkpoints</h2>
+                            <button class="btn btn-primary" id="btnNewCargo">Add Cargo Item</button>
+                        </div>
+                        <table class="tactical-table">
+                            <thead>
+                                <tr>
+                                    <th>Barcode / QR</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Weight (kg)</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cargoTable">
+                                <!-- Cargo Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Scan Checkpoint Barcode</h2>
+                        </div>
+                        <label for="scanInput" class="stat-label">Barcode / QR Code</label>
+                        <input type="text" id="scanInput" class="input-field" placeholder="Scan or enter QR Code (e.g. CRG-MED-9901)">
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="scanLocation" class="input-field" placeholder="Location (e.g. Hangar 2)">
+                            <button class="btn btn-primary" id="btnSimulateScan">Scan In</button>
+                        </div>
+
+                        <div id="qrScanResult" style="margin-top:16px; padding:12px; background:#070d16; border:1px solid var(--border-color); border-radius:6px; display:none;">
+                            <!-- Scan info -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">QR Code Generator Preview</h2>
+                        </div>
+                        <div style="text-align:center;">
+                            <canvas id="qrCanvas" width="160" height="160" style="background:#fff; padding:10px; border-radius:6px;"></canvas>
+                            <p id="qrLabel" style="font-family:var(--font-mono); margin-top:8px; color:var(--polar-blue-light);">SELECT AN ITEM TO GENERATE QR</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: INVENTORY LEDGER -->
+        <section id="tab-inventory" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Station Stock Ledger & Reorder Alerts</h2>
+                    <div>
+                        <button class="btn btn-primary" id="btnReserveStock">Reserve Stock for Expedition</button>
+                    </div>
+                </div>
+                <table class="tactical-table">
+                    <thead>
+                        <tr>
+                            <th>Barcode</th>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>On Hand Qty</th>
+                            <th>Reserved</th>
+                            <th>Available</th>
+                            <th>Expiry</th>
+                            <th>Threshold</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTable">
+                        <!-- Inventory Rows -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TAB 5: PERSONNEL & FIELD -->
+        <section id="tab-personnel" class="tab-content">
+            <div class="panel-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Field Roster & Excursion Tracker</h2>
+                    </div>
+                    <table class="tactical-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Current Location</th>
+                                <th>Last Check-In</th>
+                            </tr>
+                        </thead>
+                        <tbody id="personnelTable">
+                            <!-- Personnel Rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Field Check-Out / Check-In</h2>
+                        </div>
+                        <form id="movementForm">
+                            <label for="movePersonnelId" class="stat-label">Personnel</label>
+                            <select id="movePersonnelId" class="select-field">
+                                <!-- Populated -->
+                            </select>
+
+                            <label for="moveType" class="stat-label">Action</label>
+                            <select id="moveType" class="select-field">
+                                <option value="CHECK_OUT">CHECK OUT TO FIELD</option>
+                                <option value="CHECK_IN">CHECK IN TO STATION</option>
+                            </select>
+
+                            <label for="moveLocation" class="stat-label">Location / Sector</label>
+                            <input type="text" id="moveLocation" class="input-field" placeholder="e.g. Minna Bluff Depot" required>
+
+                            <label for="movePassword" class="stat-label">Personal Security Password</label>
+                            <input type="password" id="movePassword" class="input-field" placeholder="Enter personnel security password" required>
+
+                            <label for="moveReturn" class="stat-label">Expected Return Time</label>
+                            <input type="datetime-local" id="moveReturn" class="input-field">
+
+                            <button type="submit" class="btn btn-primary" style="width:100%;">Log Movement</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: EMERGENCY RESPONSE -->
+        <section id="tab-emergency" class="tab-content">
+            <div class="card" style="border-color:var(--alert-red);">
+                <div class="card-header" style="border-bottom-color:var(--alert-red);">
+                    <h2 class="card-title" style="color:var(--alert-red);">One-Click Emergency Incident Creator</h2>
+                </div>
+                <form id="emergencyForm" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px;">
+                    <div>
+                        <label for="incType" class="stat-label">Incident Type</label>
+                        <select id="incType" class="select-field">
+                            <option value="CREVASSE_FALL">CREVASSE FALL / VEHICLE TRAPPED</option>
+                            <option value="MEDICAL">MEDICAL EMERGENCY / FROSTBITE</option>
+                            <option value="LOST_PERSONNEL">LOST PERSONNEL / WHITE-OUT</option>
+                            <option value="MECHANICAL_FAILURE">SNOWCAT / GENERATOR FAILURE</option>
+                            <option value="FIRE">STATION / FUEL DEPOT FIRE</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="incSeverity" class="stat-label">Severity Level</label>
+                        <select id="incSeverity" class="select-field">
+                            <option value="CRITICAL_MAYDAY">CRITICAL (MAYDAY)</option>
+                            <option value="HIGH">HIGH SEVERITY</option>
+                            <option value="MEDIUM">MEDIUM</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="incLocation" class="stat-label">Location Coordinates / Sector</label>
+                        <input type="text" id="incLocation" class="input-field" placeholder="e.g. Leverett Ramp Km 1390" required>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <label for="incDesc" class="stat-label">Incident Description</label>
+                        <textarea id="incDesc" class="textarea-field" rows="2" placeholder="Describe emergency details..." required></textarea>
+                        <button type="submit" class="btn btn-danger" style="width:100%; font-size:1rem;">Broadcast Emergency & Auto-Match Team</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Active Emergency Incidents & Response Teams</h2>
+                </div>
+                <div id="incidentsContainer">
+                    <!-- Incidents rendered here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 7: SYNC & BACKUP -->
+        <section id="tab-sync" class="tab-content">
+            <div class="panel-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Satellite Sync Queue Inspector</h2>
+                        <button class="btn btn-warning" id="btnToggleSatellite">Toggle Satellite Link</button>
+                    </div>
+                    <p style="margin-bottom:16px; color:var(--text-secondary);">Local updates are stored in SQLite <code>sync_queue</code> and pushed when the satellite uplink is active.</p>
+                    <button class="btn btn-primary" id="btnTriggerSync" style="margin-bottom:16px;">Push Sync Deltas Now</button>
+
+                    <table class="tactical-table">
+                        <thead>
+                            <tr>
+                                <th>Table</th>
+                                <th>Record ID</th>
+                                <th>Operation</th>
+                                <th>Created At</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="syncQueueTable">
+                            <!-- Sync queue items -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Local Database Rolling Backups</h2>
+                        </div>
+                        <p style="font-size:0.88rem; color:var(--text-secondary); margin-bottom:16px;">
+                            Generates a non-blocking snapshot of <code>aelp_station.db</code> to the local backup partition.
+                        </p>
+                        <button class="btn btn-primary" id="btnBackupNow" style="width:100%;">Trigger Instant Local Snapshot</button>
+                        <div id="backupResult" style="margin-top:16px; font-family:var(--font-mono); font-size:0.85rem; color:var(--success-green);"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Floating Emergency Trigger Button -->
+    <button class="emergency-fab" id="fabEmergency">
+        MAYDAY ALERT
+    </button>
+
+    <script src="js/app.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/cargo.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/personnel.js"></script>
+    <script src="js/emergency.js"></script>
+    <script src="js/sync.js"></script>
+</body>
+</html>
